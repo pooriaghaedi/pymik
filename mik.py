@@ -1,8 +1,5 @@
-import paramiko
-import socket
-import os
-import re
-import datetime
+import paramiko, socket, os, re, datetime
+import multiprocessing as mp
 import time as ti
 
 
@@ -26,7 +23,6 @@ class mikssh():
     def backup(self, name):
         try:
             rfile = '/{}.rsc'.format(name)
-            # stdin, stdout, stderr = self.ssh.exec_command("/system backup save name={} dont-encrypt=yes".format(name) + "\n")
             stdin, stdout, stderr = self.ssh.exec_command("/export file={}".format(name) + "\n")
             print("------------")
             ftp_client = self.ssh.open_sftp()
@@ -54,7 +50,7 @@ class mikssh():
                 print(name)
             print("------------")
             ftp_client = self.ssh.open_sftp()
-            ftp_client.put(r"/path/to/files/{}".format(name), '{}'.format(name))
+            ftp_client.put(r"/path/to/files/{}".format(name), '{}'.format(name),callback=printTotals)
             ti.sleep(2)
             ftp_client.close()
         except Exception as e:
